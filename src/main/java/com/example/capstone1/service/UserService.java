@@ -3,18 +3,38 @@ package com.example.capstone1.service;
 import com.example.capstone1.dto.*;
 import com.example.capstone1.model.User;
 import com.example.capstone1.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails; // 추가됨
+import org.springframework.security.core.userdetails.UserDetailsService; // 추가됨
+import org.springframework.security.core.userdetails.UsernameNotFoundException; // 추가됨
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    // 생성자 주입 사용
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    // UserDetailsService의 메서드 구현
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = findByUsername(username);
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                Collections.singletonList(() -> "ROLE_" + user.getRole())
+        );
+    }
 
     // 사용자 저장
     public User saveUser(User user) {
@@ -42,7 +62,7 @@ public class UserService {
     // 사용자 이름으로 조회
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     // 사용자 선호도 업데이트
