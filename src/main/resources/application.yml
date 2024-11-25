@@ -23,11 +23,11 @@ jwt:
   secret: "6gB#Yp!3r8S!jN&fW@zR2Q$V7mLw9zT3Kj^Xx5Nc4VdZ&vQs*W" # JWT secret key
   expiration: 86400000            # 토큰 만료 시간 (ms)
 
-  mvc:
-    cors:
-      mappings:
-        "/**":
-          allowed-origins: "http://localhost:3000"
-          allowed-methods: "*"
-          allowed-headers: "*"
-          allow-credentials: true
+mvc:
+  cors:
+    mappings:
+      "/**":
+        allowed-origins: "http://localhost:3000"
+        allowed-methods: "*"
+        allowed-headers: "*"
+        allow-credentials: true
