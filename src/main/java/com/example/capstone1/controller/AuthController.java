@@ -62,9 +62,18 @@ public class AuthController {
 
             // 권한 정보 가져오기
             String username = authentication.getName();
-            var roles = authentication.getAuthorities().stream()
+            var authorities = authentication.getAuthorities();
+
+            // 디버그: 권한 정보 로그 출력
+            System.out.println("Authorities: " + authorities);
+
+            var roles = authorities.stream()
                     .map(authority -> authority.getAuthority())
                     .collect(Collectors.toList());
+            // roles 리스트가 비어있는지 확인
+            if (roles.isEmpty()) {
+                System.out.println("No roles found for user: " + username);
+            }
 
             // JWT 생성
             String token = jwtTokenProvider.generateToken(username, roles);
@@ -72,6 +81,8 @@ public class AuthController {
             // JwtResponse로 응답
             return ResponseEntity.ok(new JwtResponse(token));
         } catch (Exception e) {
+            // 예외 로그 출력
+            e.printStackTrace();
             return ResponseEntity.status(401).body("Invalid username or password");
         }
     }
