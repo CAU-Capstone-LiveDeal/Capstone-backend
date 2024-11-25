@@ -23,6 +23,10 @@ jwt:
   secret: "6gB#Yp!3r8S!jN&fW@zR2Q$V7mLw9zT3Kj^Xx5Nc4VdZ&vQs*W" # JWT secret key
   expiration: 86400000            # 토큰 만료 시간 (ms)
 
+logging:
+  level:
+    org.springframework.security: DEBUG
+
 mvc:
   cors:
     mappings:
