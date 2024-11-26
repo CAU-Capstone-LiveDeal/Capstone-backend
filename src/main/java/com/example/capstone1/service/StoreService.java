@@ -65,9 +65,6 @@ public class StoreService {
         dto.setCategory(store.getCategory());
         dto.setLatitude(store.getLatitude());
         dto.setLongitude(store.getLongitude());
-        dto.setReviews(store.getReviews().stream()
-                .map(this::mapToReviewDTO)
-                .collect(Collectors.toList()));
         return dto;
     }
 
