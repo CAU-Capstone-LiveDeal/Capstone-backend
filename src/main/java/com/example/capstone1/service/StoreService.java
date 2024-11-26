@@ -1,8 +1,7 @@
 package com.example.capstone1.service;
 
-import com.example.capstone1.dto.ReviewDTO;
 import com.example.capstone1.dto.StoreDTO;
-import com.example.capstone1.model.Review;
+import com.example.capstone1.dto.StoreRequestDTO;
 import com.example.capstone1.model.Store;
 import com.example.capstone1.model.User;
 import com.example.capstone1.repository.StoreRepository;
@@ -19,10 +18,21 @@ public class StoreService {
     @Autowired
     private StoreRepository storeRepository;
 
-    public Store saveStore(Store store) {
-        if (store.getAddress() == null || store.getAddress().isEmpty()) {
-            throw new IllegalArgumentException("Store address must not be null or empty");
+    public Store saveStore(StoreRequestDTO storeRequestDTO, User owner) {
+        Store store = mapToEntity(storeRequestDTO);
+        store.setOwner(owner);
+
+        // 혼잡도 초기화
+        if (store.getTotalTables() != null && store.getEmptyTables() != null) {
+            store.setCongestionLevel(store.calculateCongestionLevel());
+        } else {
+            store.setCongestionLevel(0); // 테이블 정보가 없을 경우 혼잡도를 0으로 설정
         }
+
+        return storeRepository.save(store);
+    }
+
+    public Store saveStore(Store store) {
         return storeRepository.save(store);
     }
 
@@ -40,18 +50,18 @@ public class StoreService {
                 .collect(Collectors.toList());
     }
 
-    public Store updateStore(Long storeId, Store updatedStore, User currentUser) {
+    public Store updateStore(Long storeId, StoreDTO updatedStoreDTO, User currentUser) {
         Store store = findById(storeId).orElseThrow(() -> new IllegalArgumentException("Store not found"));
         if (!store.getOwner().getId().equals(currentUser.getId())) {
             throw new SecurityException("You are not authorized to update this store.");
         }
 
-        store.setName(updatedStore.getName());
-        store.setAddress(updatedStore.getAddress());
-        store.setPhone(updatedStore.getPhone());
-        store.setCategory(updatedStore.getCategory());
-        store.setLatitude(updatedStore.getLatitude());
-        store.setLongitude(updatedStore.getLongitude());
+        store.setName(updatedStoreDTO.getName());
+        store.setAddress(updatedStoreDTO.getAddress());
+        store.setPhone(updatedStoreDTO.getPhone());
+        store.setCategory(updatedStoreDTO.getCategory());
+        store.setLatitude(updatedStoreDTO.getLatitude());
+        store.setLongitude(updatedStoreDTO.getLongitude());
 
         return storeRepository.save(store);
     }
@@ -65,16 +75,23 @@ public class StoreService {
         dto.setCategory(store.getCategory());
         dto.setLatitude(store.getLatitude());
         dto.setLongitude(store.getLongitude());
+        dto.setTotalTables(store.getTotalTables());
+        dto.setEmptyTables(store.getEmptyTables());
+        dto.setCongestionLevel(store.getCongestionLevel());
         return dto;
     }
 
-    private ReviewDTO mapToReviewDTO(Review review) {
-        ReviewDTO dto = new ReviewDTO();
-        dto.setId(review.getId());
-        dto.setContent(review.getContent());
-        dto.setRating(review.getRating());
-        dto.setAuthorUsername(review.getAuthor().getUsername());
-        return dto;
+    private Store mapToEntity(StoreRequestDTO storeRequestDTO) {
+        Store store = new Store();
+        store.setName(storeRequestDTO.getName());
+        store.setAddress(storeRequestDTO.getAddress());
+        store.setPhone(storeRequestDTO.getPhone());
+        store.setCategory(storeRequestDTO.getCategory());
+        store.setLatitude(storeRequestDTO.getLatitude());
+        store.setLongitude(storeRequestDTO.getLongitude());
+        store.setTotalTables(storeRequestDTO.getTotalTables());
+        store.setEmptyTables(storeRequestDTO.getEmptyTables());
+        return store;
     }
 
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
