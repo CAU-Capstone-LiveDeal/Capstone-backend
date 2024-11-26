@@ -1,6 +1,7 @@
 package com.example.capstone1.controller;
 
 import com.example.capstone1.dto.StoreDTO;
+import com.example.capstone1.dto.StoreRequestDTO;
 import com.example.capstone1.model.Store;
 import com.example.capstone1.model.User;
 import com.example.capstone1.service.StoreService;
@@ -26,13 +27,13 @@ public class StoreController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerStore(@RequestBody Store store) {
+    public ResponseEntity<?> registerStore(@RequestBody StoreRequestDTO storeRequestDTO) {
         try {
             String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
             User currentUser = userService.findByUsername(username);
 
-            store.setOwner(currentUser);
-            return ResponseEntity.ok(storeService.saveStore(store));
+            Store store = storeService.saveStore(storeRequestDTO, currentUser);
+            return ResponseEntity.ok(storeService.mapToStoreDTO(store));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
@@ -48,7 +49,6 @@ public class StoreController {
         return ResponseEntity.ok(stores);
     }
 
-
     @GetMapping("/nearby")
     public ResponseEntity<List<StoreDTO>> getNearbyStores(
             @RequestParam double latitude,
@@ -63,13 +63,13 @@ public class StoreController {
     @PutMapping("/{storeId}")
     public ResponseEntity<?> updateStore(
             @PathVariable Long storeId,
-            @RequestBody Store updatedStore) {
+            @RequestBody StoreDTO updatedStoreDTO) {
         try {
             String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
             User currentUser = userService.findByUsername(username);
 
-            Store store = storeService.updateStore(storeId, updatedStore, currentUser);
-            return ResponseEntity.ok(store);
+            Store store = storeService.updateStore(storeId, updatedStoreDTO, currentUser);
+            return ResponseEntity.ok(storeService.mapToStoreDTO(store));
         } catch (SecurityException e) {
             return ResponseEntity.status(403).body(e.getMessage());
         } catch (IllegalArgumentException e) {
@@ -77,7 +77,6 @@ public class StoreController {
         }
     }
 
-    // 혼잡도 조회
     @GetMapping("/{storeId}/congestion")
     public ResponseEntity<?> getCongestionLevel(@PathVariable Long storeId) {
         try {
@@ -88,7 +87,6 @@ public class StoreController {
         }
     }
 
-    // 혼잡도 업데이트
     @PutMapping("/{storeId}/update-congestion")
     public ResponseEntity<?> updateCongestionLevel(
             @PathVariable Long storeId,
@@ -105,6 +103,7 @@ public class StoreController {
 
             store.setEmptyTables(emptyTables);
             store.setCongestionLevel(store.calculateCongestionLevel());
+
             storeService.saveStore(store);
 
             return ResponseEntity.ok("Updated congestion level to: " + store.getCongestionLevel());

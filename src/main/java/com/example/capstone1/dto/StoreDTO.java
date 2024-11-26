@@ -2,8 +2,6 @@ package com.example.capstone1.dto;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class StoreDTO {
     private Long id;
@@ -13,4 +11,7 @@ public class StoreDTO {
     private String category;
     private Double latitude;
     private Double longitude;
+    private Integer totalTables; // 총 테이블 수
+    private Integer emptyTables; // 빈 테이블 수
+    private Integer congestionLevel; // 혼잡도
 }
