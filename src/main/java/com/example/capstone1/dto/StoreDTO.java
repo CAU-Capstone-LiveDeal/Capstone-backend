@@ -13,5 +13,4 @@ public class StoreDTO {
     private String category;
     private Double latitude;
     private Double longitude;
-    private List<ReviewDTO> reviews; // 리뷰 데이터는 DTO로 포함
 }
