@@ -31,22 +31,46 @@ public class ReviewController {
 
     @PostMapping("/{storeId}")
     public ResponseEntity<?> addReview(@PathVariable Long storeId, @RequestBody ReviewRequestDTO reviewRequestDTO) {
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        User currentUser = userService.findByUsername(username);
+        try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String username;
 
-        Store store = storeService.findById(storeId)
-                .orElseThrow(() -> new IllegalArgumentException("Store not found"));
+            if (principal instanceof UserDetails) {
+                username = ((UserDetails) principal).getUsername();
+            } else if (principal instanceof String) {
+                username = (String) principal;
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid authentication principal");
+            }
 
-        ReviewResponseDTO responseDTO = reviewService.saveReview(reviewRequestDTO, currentUser, store);
-        return ResponseEntity.ok(responseDTO);
+            User currentUser = userService.findByUsername(username);
+
+            Store store = storeService.findById(storeId)
+                    .orElseThrow(() -> new IllegalArgumentException("Store not found"));
+
+            ReviewResponseDTO responseDTO = reviewService.saveReview(reviewRequestDTO, currentUser, store);
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{reviewId}")
     public ResponseEntity<?> updateReview(@PathVariable Long reviewId, @RequestBody ReviewRequestDTO updatedReviewDTO) {
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        User currentUser = userService.findByUsername(username);
-
         try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String username;
+
+            if (principal instanceof UserDetails) {
+                username = ((UserDetails) principal).getUsername();
+            } else if (principal instanceof String) {
+                username = (String) principal;
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid authentication principal");
+            }
+
+            User currentUser = userService.findByUsername(username);
+
             ReviewResponseDTO responseDTO = reviewService.updateReview(reviewId, updatedReviewDTO, currentUser);
             return ResponseEntity.ok(responseDTO);
         } catch (SecurityException e) {
@@ -67,10 +91,20 @@ public class ReviewController {
 
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<?> deleteReview(@PathVariable Long reviewId) {
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        User currentUser = userService.findByUsername(username);
-
         try {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String username;
+
+            if (principal instanceof UserDetails) {
+                username = ((UserDetails) principal).getUsername();
+            } else if (principal instanceof String) {
+                username = (String) principal;
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid authentication principal");
+            }
+
+            User currentUser = userService.findByUsername(username);
+
             reviewService.deleteReview(reviewId, currentUser);
             return ResponseEntity.ok("Review deleted successfully");
         } catch (SecurityException e) {
