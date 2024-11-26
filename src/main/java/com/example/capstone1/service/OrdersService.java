@@ -155,6 +155,31 @@ public class OrdersService {
         ordersRepository.delete(orders);
     }
 
+    // 주문 즉시 만료 메서드
+    @Transactional
+    public void expireOrderImmediately(Long orderId, String username) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
+
+        // 주문한 사용자와 현재 사용자가 동일한지 확인
+        if (!orders.getUser().getUsername().equals(username)) {
+            throw new IllegalAccessError("만료 권한이 없습니다.");
+        }
+
+        if (!orders.isExpired()) {
+            orders.setExpired(true);
+
+            // 매장의 빈 테이블 수 증가
+            Store store = orders.getStore();
+            store.setEmptyTables(Math.min(store.getEmptyTables() + 1, store.getTotalTables()));
+            storeRepository.save(store);
+
+            ordersRepository.save(orders);
+        } else {
+            throw new IllegalStateException("이미 만료된 주문입니다.");
+        }
+    }
+
     // 주문 만료 처리
     @Transactional
     public void expireOrders() {

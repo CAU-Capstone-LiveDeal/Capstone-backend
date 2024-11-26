@@ -66,4 +66,16 @@ public class OrdersController {
         ordersService.deleteOrder(orderId, username);
         return "주문이 성공적으로 삭제되었습니다.";
     }
+
+    // 주문 즉시 만료 API
+    @PostMapping("/{orderId}/expire")
+    public ResponseEntity<?> expireOrder(@PathVariable Long orderId, Authentication authentication) {
+        String username = authentication.getName();
+        try {
+            ordersService.expireOrderImmediately(orderId, username);
+            return ResponseEntity.ok("주문이 즉시 만료되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("주문 만료 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
 }
