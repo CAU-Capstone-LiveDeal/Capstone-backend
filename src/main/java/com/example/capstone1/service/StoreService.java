@@ -1,14 +1,17 @@
 package com.example.capstone1.service;
 
+import com.example.capstone1.dto.ReviewDTO;
+import com.example.capstone1.dto.StoreDTO;
+import com.example.capstone1.model.Review;
 import com.example.capstone1.model.Store;
 import com.example.capstone1.model.User;
 import com.example.capstone1.repository.StoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StoreService {
@@ -31,40 +34,14 @@ public class StoreService {
         return storeRepository.findById(storeId);
     }
 
-    private double haversine(double lat1, double lon1, double lat2, double lon2) {
-        final int R = 6371; // 지구의 반지름 (킬로미터)
-
-        double latDistance = Math.toRadians(lat2 - lat1);
-        double lonDistance = Math.toRadians(lon1 - lon2);
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                        Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // 거리 반환 (킬로미터)
-    }
-
     public List<Store> findStoresWithinRadius(double userLat, double userLon, double radius) {
-        List<Store> allStores = findAllStores();
-        List<Store> storesWithinRadius = new ArrayList<>();
-
-        for (Store store : allStores) {
-            double distance = haversine(userLat, userLon, store.getLatitude(), store.getLongitude());
-            if (distance <= radius) {
-                storesWithinRadius.add(store);
-            }
-        }
-        return storesWithinRadius;
+        return storeRepository.findAll().stream()
+                .filter(store -> haversine(userLat, userLon, store.getLatitude(), store.getLongitude()) <= radius)
+                .collect(Collectors.toList());
     }
 
     public Store updateStore(Long storeId, Store updatedStore, User currentUser) {
-        Optional<Store> storeOpt = storeRepository.findById(storeId);
-
-        if (storeOpt.isEmpty()) {
-            throw new IllegalArgumentException("Store not found");
-        }
-
-        Store store = storeOpt.get();
-
+        Store store = findById(storeId).orElseThrow(() -> new IllegalArgumentException("Store not found"));
         if (!store.getOwner().getId().equals(currentUser.getId())) {
             throw new SecurityException("You are not authorized to update this store.");
         }
@@ -77,5 +54,40 @@ public class StoreService {
         store.setLongitude(updatedStore.getLongitude());
 
         return storeRepository.save(store);
+    }
+
+    public StoreDTO mapToStoreDTO(Store store) {
+        StoreDTO dto = new StoreDTO();
+        dto.setId(store.getId());
+        dto.setName(store.getName());
+        dto.setAddress(store.getAddress());
+        dto.setPhone(store.getPhone());
+        dto.setCategory(store.getCategory());
+        dto.setLatitude(store.getLatitude());
+        dto.setLongitude(store.getLongitude());
+        dto.setReviews(store.getReviews().stream()
+                .map(this::mapToReviewDTO)
+                .collect(Collectors.toList()));
+        return dto;
+    }
+
+    private ReviewDTO mapToReviewDTO(Review review) {
+        ReviewDTO dto = new ReviewDTO();
+        dto.setId(review.getId());
+        dto.setContent(review.getContent());
+        dto.setRating(review.getRating());
+        dto.setAuthorUsername(review.getAuthor().getUsername());
+        return dto;
+    }
+
+    private double haversine(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371;
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon1 - lon2);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 }
