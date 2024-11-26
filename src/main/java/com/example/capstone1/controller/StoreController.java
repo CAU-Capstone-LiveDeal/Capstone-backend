@@ -1,5 +1,6 @@
 package com.example.capstone1.controller;
 
+import com.example.capstone1.dto.StoreDTO;
 import com.example.capstone1.model.Store;
 import com.example.capstone1.model.User;
 import com.example.capstone1.service.StoreService;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/stores")
@@ -39,16 +41,22 @@ public class StoreController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<Store>> getAllStores() {
-        return ResponseEntity.ok(storeService.findAllStores());
+    public ResponseEntity<List<StoreDTO>> getAllStores() {
+        List<StoreDTO> stores = storeService.findAllStores().stream()
+                .map(storeService::mapToStoreDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(stores);
     }
 
+
     @GetMapping("/nearby")
-    public ResponseEntity<List<Store>> getNearbyStores(
+    public ResponseEntity<List<StoreDTO>> getNearbyStores(
             @RequestParam double latitude,
             @RequestParam double longitude,
             @RequestParam double radius) {
-        List<Store> nearbyStores = storeService.findStoresWithinRadius(latitude, longitude, radius);
+        List<StoreDTO> nearbyStores = storeService.findStoresWithinRadius(latitude, longitude, radius).stream()
+                .map(storeService::mapToStoreDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(nearbyStores);
     }
 
