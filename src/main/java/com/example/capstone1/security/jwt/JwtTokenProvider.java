@@ -32,12 +32,12 @@ public class JwtTokenProvider {
                 .claim("roles", roles) // 권한 정보를 JWT에 포함
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(key, SignatureAlgorithm.HS256) // 수정됨
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder() // 수정됨
+        return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
@@ -46,7 +46,7 @@ public class JwtTokenProvider {
     }
 
     public List<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
-        Claims claims = Jwts.parserBuilder() // 수정됨
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
@@ -58,13 +58,13 @@ public class JwtTokenProvider {
         }
 
         return roles.stream()
-                .map(SimpleGrantedAuthority::new) // Spring Security 권한으로 변환
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token); // 수정됨
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             // 로그 남기기

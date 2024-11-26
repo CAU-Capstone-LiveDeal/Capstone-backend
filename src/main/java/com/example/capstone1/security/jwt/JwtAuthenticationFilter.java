@@ -44,10 +44,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             userDetails, null, authorities);
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                    // 인증 성공 로그
+                    logger.info("Authenticated user: " + username + " with authorities: " + authorities);
                 }
             } catch (Exception e) {
-                logger.error("JWT validation failed: " + e.getMessage());
+                logger.error("JWT validation failed: " + e.getMessage(), e);
             }
+        } else {
+            logger.warn("No JWT token found in request headers");
         }
 
         filterChain.doFilter(request, response);
