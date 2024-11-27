@@ -4,8 +4,10 @@ import com.example.capstone1.dto.DiscountRequestDTO;
 import com.example.capstone1.dto.DiscountResponseDTO;
 import com.example.capstone1.model.Discount;
 import com.example.capstone1.model.Menu;
+import com.example.capstone1.model.Store;
 import com.example.capstone1.repository.DiscountRepository;
 import com.example.capstone1.repository.MenuRepository;
+import com.example.capstone1.repository.StoreRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +20,12 @@ public class DiscountService {
 
     private final DiscountRepository discountRepository;
     private final MenuRepository menuRepository;
+    private final StoreRepository storeRepository;
 
-    public DiscountService(DiscountRepository discountRepository, MenuRepository menuRepository) {
+    public DiscountService(DiscountRepository discountRepository, MenuRepository menuRepository, StoreRepository storeRepository) {
         this.discountRepository = discountRepository;
         this.menuRepository = menuRepository;
+        this.storeRepository = storeRepository;
     }
 
     // 할인 등록
@@ -37,6 +41,15 @@ public class DiscountService {
         discount.setEndTime(discountRequestDTO.getStartTime().plusHours(discountRequestDTO.getDurationHours()));
         discount.setActive(true); // 할인 등록 시 자동 활성화
 
+        // 메뉴의 할인 상태 업데이트
+        menu.applyDiscount(discount.getDiscountRate());
+        menuRepository.save(menu);
+
+        // 매장의 할인 상태 업데이트
+        Store store = menu.getStore();
+        store.updateDiscountStatus();
+        storeRepository.save(store);
+
         Discount savedDiscount = discountRepository.save(discount);
 
         return convertToResponseDTO(savedDiscount);
@@ -51,6 +64,16 @@ public class DiscountService {
         for (Discount discount : discounts) {
             discount.setActive(false);
             discountRepository.save(discount);
+
+            // 메뉴의 할인 상태 업데이트
+            Menu menu = discount.getMenu();
+            menu.removeDiscount();
+            menuRepository.save(menu);
+
+            // 매장의 할인 상태 업데이트
+            Store store = menu.getStore();
+            store.updateDiscountStatus();
+            storeRepository.save(store);
         }
     }
 
@@ -65,6 +88,18 @@ public class DiscountService {
     public void deleteDiscount(Long discountId) {
         Discount discount = discountRepository.findById(discountId)
                 .orElseThrow(() -> new IllegalArgumentException("할인을 찾을 수 없습니다."));
+
+        // 할인 삭제 시 메뉴와 매장의 할인 상태 업데이트
+        if (discount.isActive()) {
+            Menu menu = discount.getMenu();
+            menu.removeDiscount();
+            menuRepository.save(menu);
+
+            Store store = menu.getStore();
+            store.updateDiscountStatus();
+            storeRepository.save(store);
+        }
+
         discountRepository.delete(discount);
     }
 
@@ -78,6 +113,16 @@ public class DiscountService {
             if (!discount.isActive()) {
                 discount.setActive(true);
                 discountRepository.save(discount);
+
+                // 메뉴의 할인 상태 업데이트
+                Menu menu = discount.getMenu();
+                menu.applyDiscount(discount.getDiscountRate());
+                menuRepository.save(menu);
+
+                // 매장의 할인 상태 업데이트
+                Store store = menu.getStore();
+                store.updateDiscountStatus();
+                storeRepository.save(store);
             }
         }
     }

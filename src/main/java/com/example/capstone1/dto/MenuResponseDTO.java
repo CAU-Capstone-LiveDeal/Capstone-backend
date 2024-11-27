@@ -10,4 +10,7 @@ public class MenuResponseDTO {
     private String name;
     private Double price;
     private String storeName;
+    private boolean discountActive;
+    private Double discountRate;
+    private Double discountedPrice;
 }

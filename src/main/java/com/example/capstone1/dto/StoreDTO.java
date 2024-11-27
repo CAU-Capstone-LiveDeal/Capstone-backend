@@ -11,7 +11,8 @@ public class StoreDTO {
     private String category;
     private Double latitude;
     private Double longitude;
-    private Integer totalTables; // 총 테이블 수
-    private Integer emptyTables; // 빈 테이블 수
-    private Integer congestionLevel; // 혼잡도
+    private Integer totalTables;
+    private Integer emptyTables;
+    private Integer congestionLevel;
+    private boolean discountActive;
 }

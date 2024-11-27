@@ -1,9 +1,11 @@
 package com.example.capstone1.controller;
 
 import com.example.capstone1.dto.*;
+import com.example.capstone1.model.User;
 import com.example.capstone1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,18 @@ public class UserController {
             return ResponseEntity.ok("Preferences updated successfully for user: " + username);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 사용자 정보 조회
+    @GetMapping("/me")
+    public ResponseEntity<?> getUserInfo(Authentication authentication) {
+        String username = authentication.getName();
+        try {
+            User user = userService.findByUsername(username);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("사용자 정보를 가져오는 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 

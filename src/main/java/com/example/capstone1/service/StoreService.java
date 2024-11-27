@@ -21,14 +21,8 @@ public class StoreService {
     public Store saveStore(StoreRequestDTO storeRequestDTO, User owner) {
         Store store = mapToEntity(storeRequestDTO);
         store.setOwner(owner);
-
-        // 혼잡도 초기화
-        if (store.getTotalTables() != null && store.getEmptyTables() != null) {
-            store.setCongestionLevel(store.calculateCongestionLevel());
-        } else {
-            store.setCongestionLevel(0); // 테이블 정보가 없을 경우 혼잡도를 0으로 설정
-        }
-
+        store.setCongestionLevel(store.calculateCongestionLevel());
+        store.setDiscountActive(false); // 초기 할인 상태 설정
         return storeRepository.save(store);
     }
 
@@ -62,6 +56,9 @@ public class StoreService {
         store.setCategory(updatedStoreDTO.getCategory());
         store.setLatitude(updatedStoreDTO.getLatitude());
         store.setLongitude(updatedStoreDTO.getLongitude());
+        store.setTotalTables(updatedStoreDTO.getTotalTables());
+        store.setEmptyTables(updatedStoreDTO.getEmptyTables());
+        store.setCongestionLevel(store.calculateCongestionLevel());
 
         return storeRepository.save(store);
     }
@@ -78,6 +75,7 @@ public class StoreService {
         dto.setTotalTables(store.getTotalTables());
         dto.setEmptyTables(store.getEmptyTables());
         dto.setCongestionLevel(store.getCongestionLevel());
+        dto.setDiscountActive(store.isDiscountActive());
         return dto;
     }
 
