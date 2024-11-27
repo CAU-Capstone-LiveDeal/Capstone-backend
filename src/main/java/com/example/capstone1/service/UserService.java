@@ -3,13 +3,14 @@ package com.example.capstone1.service;
 import com.example.capstone1.dto.*;
 import com.example.capstone1.model.User;
 import com.example.capstone1.repository.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails; // 추가됨
-import org.springframework.security.core.userdetails.UserDetailsService; // 추가됨
-import org.springframework.security.core.userdetails.UsernameNotFoundException; // 추가됨
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -18,8 +19,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     // 생성자 주입 사용
-    public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -55,6 +55,7 @@ public class UserService implements UserDetailsService {
         user.setLatitude(registerDTO.getLatitude());
         user.setLongitude(registerDTO.getLongitude());
         user.setRole(role);
+        user.setImportance("service"); // 기본 중요성 설정
 
         return userRepository.save(user);
     }
@@ -63,6 +64,11 @@ public class UserService implements UserDetailsService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    // 사용자 전체 조회
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
     }
 
     // 사용자 선호도 업데이트
@@ -93,5 +99,32 @@ public class UserService implements UserDetailsService {
         user.setLatitude(locationDTO.getLatitude());
         user.setLongitude(locationDTO.getLongitude());
         userRepository.save(user);
+    }
+
+    // 중요성 조회
+    public String getImportance(String username) {
+        User user = findByUsername(username);
+        return user.getImportance();
+    }
+
+    // 중요성 업데이트
+    public void updateImportance(String username, UserImportanceDTO importanceDTO) {
+        User user = findByUsername(username);
+        user.setImportance(importanceDTO.getImportance());
+        userRepository.save(user);
+    }
+
+    // User 엔티티를 UserDTO로 변환
+    public UserDTO mapToUserDTO(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setAddress(user.getAddress());
+        dto.setPreferences(user.getPreferences());
+        dto.setImportance(user.getImportance()); // 중요성 추가
+        dto.setLatitude(user.getLatitude());  // 경도 추가
+        dto.setLongitude(user.getLongitude()); // 위도 추가
+        dto.setRole(user.getRole());          // 역할 추가
+        return dto;
     }
 }

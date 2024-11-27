@@ -52,6 +52,11 @@ public class User {
     @Column
     private String preferences; // 사용자 선호도 필드 추가
 
+    @Setter
+    @Getter
+    @Column(nullable = false)
+    private String importance = "taste";
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // 순환 참조 방지
     @Getter
