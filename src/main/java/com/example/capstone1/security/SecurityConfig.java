@@ -57,6 +57,10 @@ public class SecurityConfig {
                                 "/api/register",
                                 "/api/register/admin"
                         ).permitAll()
+
+                        // 할인 조회는 모두 허용
+                        .requestMatchers(HttpMethod.GET, "/api/discounts").permitAll()
+
                         // GET 요청에 대해 /api/orders 허용
                         .requestMatchers(HttpMethod.GET, "/api/orders", "/api/orders/{orderId}").permitAll()
                         // 주문 생성, 수정, 삭제는 인증 필요
