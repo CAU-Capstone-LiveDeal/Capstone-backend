@@ -82,6 +82,23 @@ public class Store {
     @Column(nullable = false)
     private boolean discountActive = false;
 
+    // Getter for averageRating
+    @Getter
+    @Column(nullable = false)
+    private Double averageRating = 0.0; // 리뷰 평균 점수
+
+    // 평균 점수 계산 및 업데이트 메서드
+    public void updateAverageRating() {
+        if (reviews.isEmpty()) {
+            this.averageRating = 0.0;
+        } else {
+            this.averageRating = reviews.stream()
+                    .mapToDouble(Review::getRating)
+                    .average()
+                    .orElse(0.0);
+        }
+    }
+
     // 기본 생성자
     public Store() {
     }

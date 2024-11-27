@@ -76,6 +76,7 @@ public class StoreService {
         dto.setEmptyTables(store.getEmptyTables());
         dto.setCongestionLevel(store.getCongestionLevel());
         dto.setDiscountActive(store.isDiscountActive());
+        dto.setAverageRating(store.getAverageRating()); // 평균 점수 추가
         return dto;
     }
 
