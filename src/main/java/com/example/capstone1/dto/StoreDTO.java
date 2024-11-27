@@ -15,4 +15,5 @@ public class StoreDTO {
     private Integer emptyTables;
     private Integer congestionLevel;
     private boolean discountActive;
+    private Double averageRating;
 }

@@ -6,6 +6,7 @@ import com.example.capstone1.model.Review;
 import com.example.capstone1.model.Store;
 import com.example.capstone1.model.User;
 import com.example.capstone1.repository.ReviewRepository;
+import com.example.capstone1.repository.StoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +19,18 @@ public class ReviewService {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    private StoreRepository storeRepository;
+
     public ReviewResponseDTO saveReview(ReviewRequestDTO reviewDTO, User author, Store store) {
         Review review = new Review(reviewDTO.getContent(), reviewDTO.getRating(), author, store);
+
         Review savedReview = reviewRepository.save(review);
+
+        // 매장의 평균 점수 업데이트
+        store.updateAverageRating();
+        storeRepository.save(store);
+
         return mapToResponseDTO(savedReview);
     }
 
@@ -34,7 +44,13 @@ public class ReviewService {
 
         existingReview.setContent(updatedReviewDTO.getContent());
         existingReview.setRating(updatedReviewDTO.getRating());
+
         Review updatedReview = reviewRepository.save(existingReview);
+
+        // 매장의 평균 점수 업데이트
+        Store store = updatedReview.getStore();
+        store.updateAverageRating();
+        storeRepository.save(store);
 
         return mapToResponseDTO(updatedReview);
     }
@@ -47,7 +63,13 @@ public class ReviewService {
             throw new SecurityException("You are not authorized to delete this review");
         }
 
+        Store store = review.getStore();
+
         reviewRepository.delete(review);
+
+        // 매장의 평균 점수 업데이트
+        store.updateAverageRating();
+        storeRepository.save(store);
     }
 
     public List<ReviewResponseDTO> findByStore(Store store) {
