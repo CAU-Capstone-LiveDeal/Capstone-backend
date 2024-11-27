@@ -1,76 +1,49 @@
 package com.example.capstone1.controller;
 
-import com.example.capstone1.model.Discount;
-import com.example.capstone1.model.Menu;
-import com.example.capstone1.model.User;
+import com.example.capstone1.dto.DiscountRequestDTO;
+import com.example.capstone1.dto.DiscountResponseDTO;
 import com.example.capstone1.service.DiscountService;
-import com.example.capstone1.service.MenuService;
-import com.example.capstone1.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/discounts")
 public class DiscountController {
 
-    @Autowired
-    private DiscountService discountService;
+    private final DiscountService discountService;
 
-    @Autowired
-    private MenuService menuService;
-
-    @Autowired
-    private UserService userService;
-
-    @PostMapping("/{menuId}")
-    public ResponseEntity<?> addDiscount(@PathVariable Long menuId, @RequestBody Discount discount) {
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        User currentUser = userService.findByUsername(username);
-
-        Menu menu = menuService.findById(menuId).orElseThrow(() -> new IllegalArgumentException("Menu not found"));
-
-        if (!menu.getStore().getOwner().getId().equals(currentUser.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to add discounts for this menu.");
-        }
-
-        discount.setMenu(menu);
-        return ResponseEntity.ok(discountService.saveDiscount(discount));
+    public DiscountController(DiscountService discountService) {
+        this.discountService = discountService;
     }
 
-    @PutMapping("/{discountId}")
-    public ResponseEntity<?> updateDiscount(@PathVariable Long discountId, @RequestBody Discount updatedDiscount) {
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        User currentUser = userService.findByUsername(username);
-
-        Discount discount = discountService.findById(discountId).orElseThrow(() -> new IllegalArgumentException("Discount not found"));
-
-        if (!discount.getMenu().getStore().getOwner().getId().equals(currentUser.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to update this discount.");
+    // 할인 등록
+    @PostMapping
+    public ResponseEntity<?> createDiscount(@RequestBody DiscountRequestDTO discountRequestDTO) {
+        try {
+            DiscountResponseDTO responseDTO = discountService.createDiscount(discountRequestDTO);
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("할인 생성 중 오류가 발생했습니다: " + e.getMessage());
         }
-
-        discount.setPercentage(updatedDiscount.getPercentage());
-        discount.setStartTime(updatedDiscount.getStartTime());
-        discount.setEndTime(updatedDiscount.getEndTime());
-
-        return ResponseEntity.ok(discountService.saveDiscount(discount));
     }
 
+    // 할인 조회
+    @GetMapping
+    public ResponseEntity<List<DiscountResponseDTO>> getAllDiscounts() {
+        List<DiscountResponseDTO> discounts = discountService.getAllDiscounts();
+        return ResponseEntity.ok(discounts);
+    }
+
+    // 할인 삭제
     @DeleteMapping("/{discountId}")
     public ResponseEntity<?> deleteDiscount(@PathVariable Long discountId) {
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        User currentUser = userService.findByUsername(username);
-
-        Discount discount = discountService.findById(discountId).orElseThrow(() -> new IllegalArgumentException("Discount not found"));
-
-        if (!discount.getMenu().getStore().getOwner().getId().equals(currentUser.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this discount.");
+        try {
+            discountService.deleteDiscount(discountId);
+            return ResponseEntity.ok("할인이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("할인 삭제 중 오류가 발생했습니다: " + e.getMessage());
         }
-
-        discountService.deleteDiscount(discount);
-        return ResponseEntity.ok("Discount deleted successfully.");
     }
 }
