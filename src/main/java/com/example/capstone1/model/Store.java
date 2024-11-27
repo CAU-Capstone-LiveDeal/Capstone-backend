@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -58,7 +59,7 @@ public class Store {
 
     @Getter
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Menu> menus; // 매장 메뉴 목록
+    private List<Menu> menus = new ArrayList<>(); // 초기화 추가
 
     @Setter
     @Getter
@@ -74,6 +75,12 @@ public class Store {
     @Getter
     @Column(nullable = false)
     private Integer congestionLevel; // 혼잡도 (1~4)
+
+    // 매장의 할인 상태 설정 메서드
+    // 할인 상태
+    @Setter
+    @Column(nullable = false)
+    private boolean discountActive = false;
 
     // 기본 생성자
     public Store() {
@@ -124,4 +131,18 @@ public class Store {
             throw new IllegalStateException("All tables are already empty.");
         }
     }
+
+    // 매장의 할인 상태 업데이트 메서드
+    public void updateDiscountStatus() {
+        this.discountActive = menus.stream().anyMatch(Menu::isDiscountActive);
+    }
+
+    // 매장의 할인 상태 확인 메서드
+    public boolean isDiscountActive() {
+        // 매장의 메뉴 중 하나라도 할인 중인 경우 true 반환
+        return menus.stream().anyMatch(Menu::isDiscountActive);
+    }
+
+
+
 }
