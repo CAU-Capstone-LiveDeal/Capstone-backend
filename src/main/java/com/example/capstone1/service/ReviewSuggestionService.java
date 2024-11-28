@@ -13,11 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 리뷰 분석 제안을 처리하는 서비스.
+ */
 @Service
 public class ReviewSuggestionService {
 
@@ -42,38 +43,61 @@ public class ReviewSuggestionService {
                 .map(Review::getContent)
                 .collect(Collectors.toList());
 
+        // 요청 DTO 생성
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("storeId", storeId);
+        requestBody.put("reviews", reviews);
+
         // AI 서버에 요청
         String aiServerUrl = "http://ai-server-url/get-review-suggestions"; // 실제 AI 서버 URL로 변경
         ReviewSuggestionResponseDTO response = restTemplate.postForObject(
                 aiServerUrl,
-                reviews,
+                requestBody,
                 ReviewSuggestionResponseDTO.class
         );
-
-        // Map<String, List<String>> -> List<ImportantReview> 변환
-        List<ImportantReview> importantReviews = new ArrayList<>();
-        for (Map.Entry<String, List<String>> entry : response.getImportantReviews().entrySet()) {
-            String category = entry.getKey();
-            for (String review : entry.getValue()) {
-                ImportantReview importantReview = new ImportantReview();
-                importantReview.setCategory(category);
-                importantReview.setReview(review);
-                importantReviews.add(importantReview);
-            }
-        }
 
         // 결과 저장
         ReviewAnalysisSuggestion suggestion = new ReviewAnalysisSuggestion();
         suggestion.setStore(store);
-        suggestion.setImportantReviews(importantReviews); // 변환된 List<ImportantReview> 설정
         suggestion.setSummary(response.getSummary());
         suggestion.setAnalyzedAt(LocalDateTime.now());
 
-        // 중요 리뷰와 관계 설정
-        for (ImportantReview review : importantReviews) {
-            review.setSuggestion(suggestion);
-        }
+        // Map<String, List<String>> -> List<ImportantReview> 변환
+        List<ImportantReview> importantReviews = response.getImportantReviews().entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                        .map(review -> {
+                            ImportantReview importantReview = new ImportantReview();
+                            importantReview.setCategory(entry.getKey());
+                            importantReview.setReview(review);
+                            importantReview.setSuggestion(suggestion);
+                            return importantReview;
+                        }))
+                .collect(Collectors.toList());
 
-        return suggestionRepository.save(suggestion);
+        suggestion.setImportantReviews(importantReviews);
+
+        suggestionRepository.save(suggestion);
+
+        return suggestion;
+    }
+
+    public ReviewSuggestionResponseDTO getReviewSuggestionResponse(Long storeId) {
+        ReviewAnalysisSuggestion suggestion = getSuggestions(storeId);
+
+        // 응답 DTO 생성
+        ReviewSuggestionResponseDTO responseDTO = new ReviewSuggestionResponseDTO();
+        responseDTO.setStoreId(suggestion.getStore().getId());
+        responseDTO.setSummary(suggestion.getSummary());
+
+        // List<ImportantReview> -> Map<String, List<String>> 변환
+        Map<String, List<String>> importantReviewsMap = suggestion.getImportantReviews().stream()
+                .collect(Collectors.groupingBy(
+                        ImportantReview::getCategory,
+                        Collectors.mapping(ImportantReview::getReview, Collectors.toList())
+                ));
+
+        responseDTO.setImportantReviews(importantReviewsMap);
+
+        return responseDTO;
     }
 }

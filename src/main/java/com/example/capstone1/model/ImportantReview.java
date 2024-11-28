@@ -13,11 +13,10 @@ public class ImportantReview {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String category; // taste, service, etc.
+    private String category; // e.g., "taste", "service"
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String review; // 리뷰 내용
+    @Column(columnDefinition = "TEXT")
+    private String review;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "suggestion_id")
