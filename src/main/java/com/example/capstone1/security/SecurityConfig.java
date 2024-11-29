@@ -84,7 +84,7 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("*"); // 필요한 도메인으로 제한 가능
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
-        configuration.setAllowCredentials(true);
+        //configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
