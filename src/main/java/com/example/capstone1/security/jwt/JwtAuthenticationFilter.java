@@ -27,10 +27,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        // Authorization 헤더에서 토큰 추출
         String header = request.getHeader("Authorization");
+        System.out.println("Authorization Header: " + header); // 헤더 전체 출력
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
+            System.out.println("Extracted Token: " + token); // 토큰 로그 출력
 
             try {
                 if (jwtTokenProvider.validateToken(token)) {
