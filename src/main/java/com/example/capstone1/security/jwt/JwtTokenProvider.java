@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private final String SECRET_KEY = "6gB#Yp!3r8S!jN&fW@zR2Q$V7mLw9zT3Kj^Xx5Nc4VdZ&vQs*W";
-    private final long EXPIRATION_TIME = 86400000; // 24시간
+    private final long EXPIRATION_TIME = 864000000; // 24시간
 
     private final Key key;
 
