@@ -44,6 +44,10 @@ public class StoreService {
                 .collect(Collectors.toList());
     }
 
+    public List<Store> findStoresByOwner(User owner) {
+        return storeRepository.findByOwner(owner);
+    }
+
     public Store updateStore(Long storeId, StoreDTO updatedStoreDTO, User currentUser) {
         Store store = findById(storeId).orElseThrow(() -> new IllegalArgumentException("Store not found"));
         if (!store.getOwner().getId().equals(currentUser.getId())) {

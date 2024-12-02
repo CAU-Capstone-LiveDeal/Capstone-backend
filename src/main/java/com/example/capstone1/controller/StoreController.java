@@ -111,4 +111,28 @@ public class StoreController {
             return ResponseEntity.status(404).body(e.getMessage());
         }
     }
+
+    @GetMapping("/my-store-id")
+    public ResponseEntity<?> getMyStoreId() {
+        try {
+            // 현재 인증된 사용자의 사용자명 가져오기
+            String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+            User currentUser = userService.findByUsername(username);
+
+            // 현재 사용자가 소유한 매장 조회
+            List<Store> userStores = storeService.findStoresByOwner(currentUser);
+
+            // 매장이 없을 경우 예외 처리
+            if (userStores.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No stores registered by the user.");
+            }
+
+            // 매장의 ID 목록 반환
+            List<Long> storeIds = userStores.stream().map(Store::getId).collect(Collectors.toList());
+            return ResponseEntity.ok(storeIds);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+        }
+    }
 }
