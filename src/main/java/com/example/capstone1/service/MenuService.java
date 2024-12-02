@@ -76,7 +76,15 @@ public class MenuService {
         responseDTO.setStoreName(menu.getStore().getName());
         responseDTO.setDiscountActive(menu.isDiscountActive());
         responseDTO.setDiscountRate(menu.getDiscountRate());
-        responseDTO.setDiscountedPrice(menu.getDiscountedPrice());
+
+        // 할인된 가격을 100단위로 반올림하여 설정
+        if (menu.isDiscountActive()) {
+            double discountedPrice = Math.round(menu.getDiscountedPrice() / 100) * 100;
+            responseDTO.setDiscountedPrice(discountedPrice);
+        } else {
+            responseDTO.setDiscountedPrice(menu.getDiscountedPrice());
+        }
+
         return responseDTO;
     }
 }

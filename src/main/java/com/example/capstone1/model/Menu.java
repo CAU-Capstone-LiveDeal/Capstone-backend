@@ -56,10 +56,10 @@ public class Menu {
     }
 
     // 할인 적용 메서드
-    public void applyDiscount(Double discountRate) {
+    public void applyDiscount(double discountRate) {
         this.discountActive = true;
         this.discountRate = discountRate;
-        this.discountedPrice = this.price * (1 - discountRate);
+        this.discountedPrice = (double) (Math.round(this.price * (1 - discountRate) / 100) * 100);
     }
 
     // 할인 해제 메서드
