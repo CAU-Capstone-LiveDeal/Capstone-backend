@@ -23,17 +23,17 @@ public class StoreCongestionService {
         this.storeCongestionRepository = storeCongestionRepository;
     }
 
-    public void addCongestion(StoreCongestionRequestDTO requestDTO) {
-        Store store = storeRepository.findById(requestDTO.getStoreId())
+    public StoreCongestion registerCongestion(StoreCongestionRequestDTO request) {
+        Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new IllegalArgumentException("Store not found"));
 
         StoreCongestion congestion = new StoreCongestion();
         congestion.setStore(store);
-        congestion.setDate(LocalDate.now());
-        congestion.setTimeSlot(requestDTO.getTimeSlot());
-        congestion.setCongestionLevel(requestDTO.getCongestionLevel());
+        congestion.setTimeSlot(request.getTimeSlot());
+        congestion.setCongestionLevel(request.getCongestionLevel());
+        congestion.setDate(request.getDate());
 
-        storeCongestionRepository.save(congestion);
+        return storeCongestionRepository.save(congestion);
     }
 
     public List<StoreCongestionResponseDTO> getCongestionByStoreAndDate(Long storeId, LocalDate date) {

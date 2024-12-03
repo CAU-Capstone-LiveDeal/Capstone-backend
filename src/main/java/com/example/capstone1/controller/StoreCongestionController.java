@@ -2,6 +2,7 @@ package com.example.capstone1.controller;
 
 import com.example.capstone1.dto.StoreCongestionRequestDTO;
 import com.example.capstone1.dto.StoreCongestionResponseDTO;
+import com.example.capstone1.model.StoreCongestion;
 import com.example.capstone1.service.StoreCongestionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +21,9 @@ public class StoreCongestionController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerCongestion(@RequestBody StoreCongestionRequestDTO requestDTO) {
-        storeCongestionService.addCongestion(requestDTO);
-        return ResponseEntity.ok("Congestion registered successfully");
+    public ResponseEntity<StoreCongestion> registerCongestion(@RequestBody StoreCongestionRequestDTO request) {
+        StoreCongestion congestion = storeCongestionService.registerCongestion(request);
+        return ResponseEntity.ok(congestion);
     }
 
     @GetMapping("/{storeId}/all")
