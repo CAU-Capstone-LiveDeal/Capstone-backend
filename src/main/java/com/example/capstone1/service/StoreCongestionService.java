@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 @Service
 public class StoreCongestionService {
 
@@ -23,7 +22,7 @@ public class StoreCongestionService {
         this.storeCongestionRepository = storeCongestionRepository;
     }
 
-    public StoreCongestion registerCongestion(StoreCongestionRequestDTO request) {
+    public StoreCongestionResponseDTO registerCongestion(StoreCongestionRequestDTO request) {
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new IllegalArgumentException("Store not found"));
 
@@ -33,7 +32,14 @@ public class StoreCongestionService {
         congestion.setCongestionLevel(request.getCongestionLevel());
         congestion.setDate(request.getDate());
 
-        return storeCongestionRepository.save(congestion);
+        StoreCongestion savedCongestion = storeCongestionRepository.save(congestion);
+
+        // 저장된 데이터로 간단한 응답 객체 생성
+        return new StoreCongestionResponseDTO(
+                savedCongestion.getDate(),
+                savedCongestion.getTimeSlot(),
+                savedCongestion.getCongestionLevel()
+        );
     }
 
     public List<StoreCongestionResponseDTO> getCongestionByStoreAndDate(Long storeId, LocalDate date) {
