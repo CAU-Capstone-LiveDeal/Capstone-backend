@@ -21,9 +21,9 @@ public class StoreCongestionController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<StoreCongestion> registerCongestion(@RequestBody StoreCongestionRequestDTO request) {
-        StoreCongestion congestion = storeCongestionService.registerCongestion(request);
-        return ResponseEntity.ok(congestion);
+    public ResponseEntity<StoreCongestionResponseDTO> registerCongestion(@RequestBody StoreCongestionRequestDTO request) {
+        StoreCongestionResponseDTO response = storeCongestionService.registerCongestion(request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{storeId}/all")
