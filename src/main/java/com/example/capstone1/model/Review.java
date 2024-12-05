@@ -46,4 +46,13 @@ public class Review {
         this.author = author;
         this.store = store;
     }
+
+    /**
+     * 작성자의 사용자 이름을 반환합니다.
+     *
+     * @return 작성자의 사용자 이름
+     */
+    public String getAuthorUsername() {
+        return author.getUsername();
+    }
 }
