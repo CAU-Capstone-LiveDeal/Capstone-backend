@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByStore(Store store);
+    // 추가된 메서드: storeId로 리뷰 조회
+    List<Review> findByStoreId(Long storeId);
 }

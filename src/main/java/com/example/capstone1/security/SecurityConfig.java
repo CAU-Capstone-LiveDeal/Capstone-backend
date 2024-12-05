@@ -55,7 +55,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/login",
                                 "/api/register",
-                                "/api/register/admin"
+                                "/api/register/admin",
+                                "/api/recommendations/**"
                         ).permitAll()
 
                         // 할인 조회는 모두 허용
