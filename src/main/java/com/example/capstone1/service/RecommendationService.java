@@ -74,7 +74,7 @@ public class RecommendationService {
         logger.debug("Sending reviews to AI server: {}", aiReviewDTOs);
 
         // AI 서버 URL
-        String aiServerUrl = "https://8c20-219-255-207-61.ngrok-free.app/reviewscore/scoring_reviews/"; // 실제 AI 서버 URL로 변경
+        String aiServerUrl = "https://0eaf-49-142-59-70.ngrok-free.app/reviewscore/scoring_reviews/"; // 실제 AI 서버 URL로 변경
 
         try {
             // 응답 타입 정의
