@@ -56,8 +56,12 @@ public class SecurityConfig {
                                 "/api/login",
                                 "/api/register",
                                 "/api/register/admin",
-                                "/api/recommendations/**"
+                                "/api/recommendations/**",
+                                "/api/top5recommendations/**"
                         ).permitAll()
+
+                        // 에러 페이지는 모두 허용
+                        .requestMatchers("/error").permitAll()
 
                         // 할인 조회는 모두 허용
                         .requestMatchers(HttpMethod.GET, "/api/discounts").permitAll()
