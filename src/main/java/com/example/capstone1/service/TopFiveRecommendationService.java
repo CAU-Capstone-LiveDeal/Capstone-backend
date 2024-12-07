@@ -88,7 +88,7 @@ public class TopFiveRecommendationService {
             logger.debug("Request to AI server: {}", requestJson);
 
             // AI 서버 URL
-            String aiServerUrl = "https://0eaf-49-142-59-70.ngrok-free.app/recommend/recommend";
+            String aiServerUrl = "https://e4fd-49-142-59-70.ngrok-free.app/recommend/recommend";
 
             // 응답 타입 정의
             ParameterizedTypeReference<TopFiveRecommendationResponseDTO> responseType =

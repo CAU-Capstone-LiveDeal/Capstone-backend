@@ -50,7 +50,7 @@
 //        put("일식", new String[]{"초밥", "사시미", "우동", "라멘", "텐동", "돈부리", "야키소바", "오코노미야키", "타코야키", "덴푸라"});
 //    }};
 //
-//    private final String[] importanceOptions = {"맛", "인테리어", "청결도", "서비스"};
+//    private final String[] importanceOptions = {"taste", "interior", "cleanliness", "service"};
 //
 //    @Override
 //    public void run(String... args) throws Exception {
@@ -70,7 +70,7 @@
 //
 //        // 사용자 계정 생성 (500명)
 //        List<User> normalUsers = new ArrayList<>();
-//        for (int i = 1; i <= 500; i++) {
+//        for (int i = 1; i <= 100; i++) {
 //            User user = new User(
 //                    "user" + i,
 //                    "password",
@@ -89,7 +89,7 @@
 //        List<Store> stores = new ArrayList<>();
 //        int storeIdCounter = 1;
 //        for (User owner : adminUsers) {
-//            for (int j = 0; j < 3; j++) { // 각 어드민당 매장 3개 등록
+//            for (int j = 0; j < 10; j++) { // 각 어드민당 매장 10개 등록
 //                String category = categories[random.nextInt(categories.length)];
 //
 //                Store store = new Store(
