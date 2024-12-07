@@ -23,9 +23,13 @@ jwt:
   secret: "6gB#Yp!3r8S!jN&fW@zR2Q$V7mLw9zT3Kj^Xx5Nc4VdZ&vQs*W" # JWT secret key
   expiration: 864000000            # 토큰 만료 시간 (ms)
 
+# application.yml에서 JSON 포맷 설정
 logging:
+  pattern:
+    console: '{"time":"%d{yyyy-MM-dd HH:mm:ss}", "level":"%5p", "thread":"%t", "logger":"%c", "message":"%m"}%n'
   level:
-    org.springframework.security: DEBUG
+    root: INFO
+    com.example.capstone1.service.TopFiveRecommendationService: DEBUG
 
 mvc:
   cors:
