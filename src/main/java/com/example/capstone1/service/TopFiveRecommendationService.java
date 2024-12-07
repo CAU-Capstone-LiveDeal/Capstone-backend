@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,7 +79,7 @@ public class TopFiveRecommendationService {
 
         // TopFiveRecommendationRequestDTO 구성
         TopFiveRecommendationRequestDTO requestDTO = new TopFiveRecommendationRequestDTO();
-        requestDTO.setPreferType(preferType);
+        requestDTO.setPreferType(Collections.singletonList(preferType));
         requestDTO.setPreferCategories(preferCategories);
         requestDTO.setStorelist(storeList);
 
@@ -88,7 +89,7 @@ public class TopFiveRecommendationService {
             logger.debug("Request to AI server: {}", requestJson);
 
             // AI 서버 URL
-            String aiServerUrl = "https://e4fd-49-142-59-70.ngrok-free.app/recommend/recommend";
+            String aiServerUrl = "https://d656-49-142-59-70.ngrok-free.app/recommend/recommend";
 
             // 응답 타입 정의
             ParameterizedTypeReference<TopFiveRecommendationResponseDTO> responseType =
