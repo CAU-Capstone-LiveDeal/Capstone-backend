@@ -52,6 +52,24 @@
 //
 //    private final String[] importanceOptions = {"taste", "interior", "cleanliness", "service"};
 //
+//    // 추가: 카테고리별 매장 이름 배열
+//    private final String[] koreanStoreNames = {
+//            "김치마을", "한우정육식당", "비빔밥 클럽", "찜닭 명가", "갈비의 정석",
+//            "전주비빔밥 하우스", "순대국밥 사랑방", "한옥 찻집", "푸른 들판", "고기랑 막걸리"
+//    };
+//    private final String[] chineseStoreNames = {
+//            "차이나 다이닝", "황궁 식당", "마라탕 천국", "홍콩 딤섬 하우스", "북경 바오즈",
+//            "샹차이 레스토랑", "쓰촨 마라관", "대만 누들바", "푸젠 하이디엔", "광둥 정통 요리"
+//    };
+//    private final String[] westernStoreNames = {
+//            "더 그릴 하우스", "올리브 가든", "비스트로 라 뷰", "마르코스 피자", "벨라 비타",
+//            "샤르망 키친", "루미에르 카페", "포레스트 디너", "버건디 와인 & 스테이크", "미라클 파스타"
+//    };
+//    private final String[] japaneseStoreNames = {
+//            "스시 가이샤", "오마카세 미나토", "야끼토리 한잔", "텐푸라 텐노", "라멘야 하루",
+//            "사쿠라 스시바", "이자카야 호토리", "사케와 스시", "미야비 테이", "도쿄 델리"
+//    };
+//
 //    @Override
 //    public void run(String... args) throws Exception {
 //        // 관리자 계정 생성 (50명)
@@ -68,7 +86,7 @@
 //            adminUsers.add(userRepository.save(admin));
 //        }
 //
-//        // 사용자 계정 생성 (500명)
+//        // 사용자 계정 생성 (100명)
 //        List<User> normalUsers = new ArrayList<>();
 //        for (int i = 1; i <= 100; i++) {
 //            User user = new User(
@@ -92,8 +110,28 @@
 //            for (int j = 0; j < 10; j++) { // 각 어드민당 매장 10개 등록
 //                String category = categories[random.nextInt(categories.length)];
 //
+//                // 카테고리에 맞게 매장 이름 선택
+//                String storeName;
+//                switch (category) {
+//                    case "한식":
+//                        storeName = koreanStoreNames[(storeIdCounter - 1) % koreanStoreNames.length];
+//                        break;
+//                    case "중식":
+//                        storeName = chineseStoreNames[(storeIdCounter - 1) % chineseStoreNames.length];
+//                        break;
+//                    case "양식":
+//                        storeName = westernStoreNames[(storeIdCounter - 1) % westernStoreNames.length];
+//                        break;
+//                    case "일식":
+//                        storeName = japaneseStoreNames[(storeIdCounter - 1) % japaneseStoreNames.length];
+//                        break;
+//                    default:
+//                        storeName = category + " 매장 " + storeIdCounter;
+//                        break;
+//                }
+//
 //                Store store = new Store(
-//                        category + " Store " + (storeIdCounter++),
+//                        storeName,
 //                        "Store Address " + storeIdCounter,
 //                        "010-1234-56" + String.format("%02d", random.nextInt(100)),
 //                        category,
@@ -105,6 +143,7 @@
 //                );
 //                store = storeRepository.save(store);
 //                stores.add(store);
+//                storeIdCounter++;
 //
 //                // 매장 분석 점수 생성
 //                StoreAnalysisScore analysisScore = new StoreAnalysisScore();
