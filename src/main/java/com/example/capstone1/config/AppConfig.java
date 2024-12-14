@@ -9,6 +9,10 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class AppConfig {
 
+    // 연결 및 읽기 타임아웃 설정 (예: 5초)
+    int connectTimeout = 5000;
+    int readTimeout = 5000;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
