@@ -18,6 +18,8 @@ public class ReviewAnalysisController {
 
     @GetMapping("/store/{storeId}")
     public ResponseEntity<ReviewAnalysisResponseDTO> getReviewAnalysis(@PathVariable Long storeId) {
+        // RestTemplate 타임아웃 적용은 RestTemplateConfig에서 처리됨.
+        // analysisService는 해당 설정이 적용된 RestTemplate Bean을 사용.
         ReviewAnalysisResponseDTO responseDTO = analysisService.getReviewAnalysisResponse(storeId);
         return ResponseEntity.ok(responseDTO);
     }

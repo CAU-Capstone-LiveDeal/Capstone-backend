@@ -5,8 +5,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+//import org.locationtech.jts.geom.Point;
+
 
 @Entity
 public class Store {
@@ -45,6 +48,10 @@ public class Store {
     @Getter
     @Column(nullable = false)
     private Double longitude; // 경도 필드 추가
+
+//    public void setLocation(Point location) {
+//        this.location = location;
+//    }
 
     @Setter
     @Getter
